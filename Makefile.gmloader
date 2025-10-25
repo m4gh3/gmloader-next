@@ -33,11 +33,19 @@ LDFLAGS:=${OPTM} -Wl,--gc-sections -Wl,--defsym,BUILD_DATE_$(BUILD_DATE)=0 -Wl,-
 # General pre-processing flags
 LLVM_FILE?=
 LLVM_INC?=/usr/${ARCH}/include
-GENERATE?=--llvm-includes ${LLVM_INC}
+LLVM_SYSROOT?=
+
+GENERATE?=
+
+ifneq (${LLVM_SYSROOT},)
+	GENERATE+=--llvm-sysroot="${LLVM_SYSROOT}"
+endif
 
 ifneq (${LLVM_FILE},)
-	GENERATE+=--llvm-library-file "${LLVM_FILE}"
+	GENERATE+=--llvm-library-file="${LLVM_FILE}"
 endif
+
+GENERATE+=--llvm-includes ${LLVM_INC}
 
 ifeq (${DEVICE_ARCH},aarch64)
 	FMOD_ARCH=arm64

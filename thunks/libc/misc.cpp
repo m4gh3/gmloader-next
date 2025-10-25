@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <link.h>
+#include <sys/syscall.h>
 #include "platform.h"
 #include "so_util.h"
 
@@ -31,9 +32,13 @@ extern "C" ABI_ATTR int login_tty_impl(int fd)
 
 extern "C" ABI_ATTR long syscall_impl(long number, ...)
 {
+#ifdef gettid
     if (number == 0xb2)
         return gettid();
-    
+#else
+    if (number == 0xb2)
+        return syscall(SYS_gettid);
+#endif
     return 0;
 }
 

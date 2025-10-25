@@ -26,7 +26,7 @@
 /* #undef HAVE_CLONEFILE */
 /* #undef HAVE_COMMONCRYPTO */
 /* #undef HAVE_CRYPTO */
-#define HAVE_FICLONERANGE
+/* #undef HAVE_FICLONERANGE */
 #define HAVE_FILENO
 #define HAVE_FCHMOD
 #define HAVE_FSEEKO

@@ -31,7 +31,9 @@
 #include <stdnoreturn.h>
 #include <string.h>
 #include <tgmath.h>
+#ifndef __STDC_NO_THREADS__
 #include <threads.h>
+#endif
 #include <time.h>
 #include <uchar.h>
 #include <wchar.h>

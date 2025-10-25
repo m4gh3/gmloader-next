@@ -21,6 +21,7 @@ Now build the project for your desired target platforms, the following build opt
 
 - `ARCH`: Specify the architecture, e.g.: `aarch64-linux-gnu` or `arm-linux-gnueabihf`
 - `LLVM_FILE`: Specify the LLVM Clang library file, e.g.: `/usr/lib/llvm-9/lib/libclang-9.so.1` for clang-9.
+- `LLVM_SYSROOT`: Specify the path for the toolchain's sysroot, e.g. `${TOOLCHAIN}/arm-linux-gnueabihf`.
 - `LLVM_INC`: Specify the path for LLVM includes for your architecture, e.g.: `aarch64-linux-gnu`.
 - `OPTM`: Specify the optimization flags, e.g.: `-O3`, `-Os` or `-Og -ggdb`.
 - `USE_FMOD`: Whether to build FMOD Extension support.
@@ -33,12 +34,24 @@ make -f Makefile.gmloader ARCH=aarch64-linux-gnu
 As an example, you can build this using Debian Bullseye to target older platforms:
 
 ```bash
+# You can manually process the thunks if needed...
+python3 scripts/generate_libc.py aarch64-linux-gnu --llvm-includes /usr/aarch64-linux-gnu/include/c++/10/aarch64-linux-gnu --llvm-library-file "/usr/lib/llvm-11/lib/libclang-11.so.1"
+
+# But specifying the LLVM flags to the Makefile works too.
 make -f Makefile.gmloader \
 ARCH=aarch64-linux-gnu \
 LLVM_FILE=/usr/lib/llvm-11/lib/libclang-11.so.1 \
 LLVM_INC=/usr/aarch64-linux-gnu/include/c++/10/aarch64-linux-gnu \
 -j$(nproc)
-python3 scripts/generate_libc.py aarch64-linux-gnu --llvm-includes /usr/aarch64-linux-gnu/include/c++/10/aarch64-linux-gnu --llvm-library-file "/usr/lib/llvm-11/lib/libclang-11.so.1"
+```
+
+Or even using custom toolchains, such as [EverSDK](github.com/johnnyonflame/EverSDK):
+
+```bash
+TOOLCHAIN=~/eversdk/toolchain \
+make -f Makefile.gmloader ARCH=arm-linux-gnueabihf \
+LLVM_INC="${TOOLCHAIN}/arm-linux-gnueabihf/sysroot/usr/include ${TOOLCHAIN}/arm-linux-gnueabihf/include/c++/13.2.0 ${TOOLCHAIN}/arm-linux-gnueabihf/include/c++/13.2.0/arm-linux-gnueabihf" \
+LLVM_SYSROOT="${TOOLCHAIN}/arm-linux-gnueabihf"
 ```
 
 Now, to deploy, you must copy the `lib` redist folder in the application's folder. Those files are dependencies of the guest Android application (e.g. the runner) and are used to provide

@@ -6,6 +6,7 @@ import clang.enumerations
 import clang.cindex
 import clang.cindex as cl
 import sys
+import os
 import glob
 import sys
 import argparse
@@ -15,6 +16,7 @@ parser = argparse.ArgumentParser(
     description="Generate the bionic export tables and headers")
 
 parser.add_argument('arch', type=str)
+parser.add_argument('--llvm-sysroot', type=str)
 parser.add_argument('--llvm-library-file', help="LLVM library file")
 parser.add_argument('--llvm-includes', nargs='+')
 
@@ -210,6 +212,13 @@ if __name__ == '__main__':
     arch=args.arch
     target_platform="--target={arch}".format(arch=arch)
     build_path="build/{arch}/".format(arch=arch)
+    sysroot=[]
+    if args.llvm_sysroot:
+        sysroot = [f"--sysroot={args.llvm_sysroot}"]
+
+    # Ensure we can run the utility stand-alone from a clean repo
+    os.makedirs(f"{build_path}", exist_ok=True)
+    os.makedirs(f"{build_path}/thunks/libc", exist_ok=True)
 
     print("{call}: settings:".format(call=sys.argv[0]))
     print("# arch={}".format(arch))
@@ -248,20 +257,20 @@ if __name__ == '__main__':
             continue
 
         print("Processing {}".format(i))
-        translation_unit = index.parse(i, args=["-std=c++17", *includes, target_platform])
+        translation_unit = index.parse(i, args=["-std=c++17", *includes, target_platform, *sysroot])
         handle_diagnostics(translation_unit.diagnostics)
         extract_impl_functions(translation_unit.cursor)
 
     # Parse easy exports - things we can thunk directly
     print("Processing thunks/libc/common.hpp")
-    translation_unit = index.parse("thunks/libc/common.hpp", args=["-std=c++17", *includes, target_platform])
+    translation_unit = index.parse("thunks/libc/common.hpp", args=["-std=c++17", *includes, target_platform, *sysroot])
     handle_diagnostics(translation_unit.diagnostics)
     extract_function_signatures(translation_unit.cursor)
 
     # Parse more easy exports - those are defined as extern "C" and put into a namespace
     # in order to avoid the overloaded/ambiguous C++ headers.
     print("Processing thunks/libc/c_prototypes.h")
-    translation_unit = index.parse("thunks/libc/c_prototypes.h", args=["-std=c11", *includes, "-DIS_TAB_GEN=1", target_platform])
+    translation_unit = index.parse("thunks/libc/c_prototypes.h", args=["-std=c11", *includes, "-DIS_TAB_GEN=1", target_platform, *sysroot])
     handle_diagnostics(translation_unit.diagnostics)
     extract_c_impl_functions(translation_unit.cursor)
 
