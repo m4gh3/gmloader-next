@@ -4,6 +4,7 @@ CC := ${CROSS}gcc
 CXX := ${CROSS}g++
 LD := ${CROSS}ld
 PKG_CONFIG := ${CROSS}pkg-config
+STATIC_LIBSTDCXX ?= 0
 
 BUILD_DATE = $(shell date +"%Y%m%d_%H%M%S")
 GIT_BRANCH = ${GITHUB_REF_NAME}
@@ -70,6 +71,10 @@ ifeq (${VIDEO_SUPPORT},1)
 	CFLAGS+=-DVIDEO_SUPPORT=1 -I./3rdparty/SDL_kitchensink/include
 	LIBS+=-lavcodec -lavformat -lswresample -lswscale -lavutil
 	-include 3rdparty/SDL_kitchensink.mk
+endif
+
+ifeq (${STATIC_LIBSTDCXX},1)
+	LIBS+=-static-libstdc++
 endif
 
 # Used by generate_libc.py to generate the function tables that are exported to the

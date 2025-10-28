@@ -24,6 +24,7 @@ Now build the project for your desired target platforms, the following build opt
 - `LLVM_SYSROOT`: Specify the path for the toolchain's sysroot, e.g. `${TOOLCHAIN}/arm-linux-gnueabihf`.
 - `LLVM_INC`: Specify the path for LLVM includes for your architecture, e.g.: `aarch64-linux-gnu`.
 - `OPTM`: Specify the optimization flags, e.g.: `-O3`, `-Os` or `-Og -ggdb`.
+- `STATIC_LIBSTDCXX`: Link libstdc++ statically (useful for legacy platforms).
 - `USE_FMOD`: Whether to build FMOD Extension support.
     - You need to extract fmodstudioapi.tar.gz into `3rdparty/fmod` for FMOD support.
 
@@ -48,7 +49,8 @@ LLVM_INC=/usr/aarch64-linux-gnu/include/c++/10/aarch64-linux-gnu \
 Or even using custom toolchains, such as [EverSDK](github.com/johnnyonflame/EverSDK):
 
 ```bash
-TOOLCHAIN=~/eversdk/toolchain \
+export TOOLCHAIN=${HOME}/eversdk/toolchain
+export PATH=$PATH:${TOOLCHAIN}/bin
 make -f Makefile.gmloader ARCH=arm-linux-gnueabihf \
 LLVM_INC="${TOOLCHAIN}/arm-linux-gnueabihf/sysroot/usr/include ${TOOLCHAIN}/arm-linux-gnueabihf/include/c++/13.2.0 ${TOOLCHAIN}/arm-linux-gnueabihf/include/c++/13.2.0/arm-linux-gnueabihf" \
 LLVM_SYSROOT="${TOOLCHAIN}/arm-linux-gnueabihf"
