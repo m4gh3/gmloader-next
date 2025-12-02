@@ -94,7 +94,7 @@ double FORCE_PLATFORM = os_android;
 
 size_t g_function_stride = 0;
 fct_add_t Original_Function_Add = NULL;
-static std::unordered_map<std::string, FunctionEntry*> g_function_map;
+static std::unordered_map<std::string, bool> g_function_map;
 
 ReentrantHook REHPrepareGame = {};
 ReentrantHook REHFunctionAdd = {};
@@ -107,33 +107,10 @@ ReentrantHook REHFunctionAdd = {};
 * Oops.
 */
 
-// Detect the size/stride of FunctionEntry in the function table
-size_t detect_function_entry_stride(FunctionEntry **functions, int count) {
-    if (!functions || count < 2) return sizeof(FunctionEntry);
-
-    FunctionEntry* first = functions[0];
-    FunctionEntry* second = functions[1];
-
-    size_t stride = reinterpret_cast<uintptr_t>(second) - reinterpret_cast<uintptr_t>(first);
-    if (stride < sizeof(FunctionEntry)) {
-        stride = sizeof(FunctionEntry);
-    }
-    return stride;
-}
-
 void Function_Add_Hook(const char* f_name, routine_t func, int arg_count, char reg)
 {
     if (!the_functions || !the_numb) {
         return;
-    }
-
-    // Stride Detection
-    if (g_function_stride == 0) {
-        if (*the_numb >= 2) {
-            g_function_stride = detect_function_entry_stride(the_functions, *the_numb);
-        } else {
-            g_function_stride = 0x18;
-        }
     }
 
     auto it = g_function_map.find(f_name);
@@ -145,14 +122,7 @@ void Function_Add_Hook(const char* f_name, routine_t func, int arg_count, char r
     Original_Function_Add(f_name, func, arg_count, reg);
     rehook_hook(&REHFunctionAdd);
 
-    FunctionEntry* list_base = (FunctionEntry*)*the_functions;
-    int n = *the_numb;
-
-    FunctionEntry* new_entry = reinterpret_cast<FunctionEntry*>(
-        reinterpret_cast<uintptr_t>(list_base) + (n - 1) * g_function_stride
-    );
-
-    g_function_map[f_name] = new_entry;
+    g_function_map[f_name] = true;
 }
 
 ABI_ATTR int _dbg_csol_print(void *csol, const char *fmt, ...) {
