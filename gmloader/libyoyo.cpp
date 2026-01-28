@@ -403,7 +403,9 @@ void patch_libyoyo(so_module *mod)
 
     // Define some stubbed gamemaker functions for compatibility with odd games
     for (int i = 0; i < ARRAY_SIZE(fake_functs); i++) {
+	usleep(10000);
         Function_Add(fake_functs[i], stub_gml, 1, 1);
+	usleep(10000);
     }
 
     Function_Add("window_handle", window_handle, 0, 1);

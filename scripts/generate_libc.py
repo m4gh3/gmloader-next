@@ -2,9 +2,10 @@
 #But keep it working with python2 if possible please.
 
 from ctypes import *
-import clang.enumerations
+#import clang.enumerations
 import clang.cindex
 import clang.cindex as cl
+from clang.cindex import ExceptionSpecificationKind
 import sys
 import os
 import glob
@@ -52,28 +53,28 @@ variadic = []
 ambiguous = []
 c_protos = []
 
-class ExceptionSpecificationKind(clang.cindex.BaseEnumeration):
-    """
-    An ExceptionSpecificationKind describes the kind of exception specification
-    that a function has.
-    """
-
-    # The required BaseEnumeration declarations.
-    _kinds = []
-    _name_map = None
-
-    def __repr__(self):
-        return 'ExceptionSpecificationKind.{}'.format(self.name)
-
-ExceptionSpecificationKind.NONE = ExceptionSpecificationKind(0)
-ExceptionSpecificationKind.DYNAMIC_NONE = ExceptionSpecificationKind(1)
-ExceptionSpecificationKind.DYNAMIC = ExceptionSpecificationKind(2)
-ExceptionSpecificationKind.MS_ANY = ExceptionSpecificationKind(3)
-ExceptionSpecificationKind.BASIC_NOEXCEPT = ExceptionSpecificationKind(4)
-ExceptionSpecificationKind.COMPUTED_NOEXCEPT = ExceptionSpecificationKind(5)
-ExceptionSpecificationKind.UNEVALUATED = ExceptionSpecificationKind(6)
-ExceptionSpecificationKind.UNINSTANTIATED = ExceptionSpecificationKind(7)
-ExceptionSpecificationKind.UNPARSED = ExceptionSpecificationKind(8)
+#class ExceptionSpecificationKind(clang.cindex.BaseEnumeration):
+#    """
+#    An ExceptionSpecificationKind describes the kind of exception specification
+#    that a function has.
+#    """
+#
+#    # The required BaseEnumeration declarations.
+#    _kinds = []
+#    _name_map = None
+#
+#    def __repr__(self):
+#        return 'ExceptionSpecificationKind.{}'.format(self.name)
+#
+#ExceptionSpecificationKind.NONE = 0
+#ExceptionSpecificationKind.DYNAMIC_NONE = 1
+#ExceptionSpecificationKind.DYNAMIC = 2
+#ExceptionSpecificationKind.MS_ANY = 3
+#ExceptionSpecificationKind.BASIC_NOEXCEPT = 4
+#ExceptionSpecificationKind.COMPUTED_NOEXCEPT = 5
+#ExceptionSpecificationKind.UNEVALUATED = 6
+#ExceptionSpecificationKind.UNINSTANTIATED = 7
+#ExceptionSpecificationKind.UNPARSED = 8
 
 
 def get_node_text(node):
